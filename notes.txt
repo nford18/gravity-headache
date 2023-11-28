@@ -1,0 +1,11 @@
+
+Paper Main Ideas for My steps
+
+1. working code
+
+2. invesitgation into real near-earth asteroids
+    - use those and measure the acceleration effects on LISA
+    - what info do I need (three angles, eccentricity) (shane's paper)
+
+3. look at bernicky's paper 
+    - he uses an evolution on asteroids and 
