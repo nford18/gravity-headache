@@ -1,4 +1,5 @@
 #define _USE_MATH_DEFINES
+#define LINE_MAX 150
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -10,7 +11,6 @@ int f_m = 1; // modulation frequency (1/yr)
 // these give the initial ecliptic longitude and orientation of the constellation
 double lambda = 0;
 double kappa = 0; 
-int LINE_MAX = 150;
 
 /**
  * function to give LISA model position data from a time and n value
