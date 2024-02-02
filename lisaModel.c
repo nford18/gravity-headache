@@ -36,9 +36,10 @@ int main(){
     // data format: x0,y0,z0,x1,y1,z1,x2,y2,z2\n"
     // time in years
     double t_max = 1;
-    double dt = 1/365/24/3600; // 0.001;
+    int N = 365*24*3600;
+    double dt = t_max/N; // 0.001;
 
-    for(int i=0; i<(int)floor(t_max/dt); i++){
+    for(int i=0; i<N; i++){
         char temp[100];
         strcpy(temp, "");
         for (int n=0; n<3; n++){

@@ -8,15 +8,18 @@
 /**
  * Function adapted from a matlab program found at this url:
  * https://www.matlab-monkey.com/astro/keplerEquation/KeplerEquationPub.html
+ * 
+ * @param N number of divisions for the ellipse
+ * @param e eccentricity of the ellipse
+ * @param a semi-major axis of the ellipse (AU)
+ * 
+ * @return pointer to an array of true anomaly values for the elliptical orbit
  */
-double* getThetas() {
-    double e = 0.4;     // eccentricity
-    double a = 1;       // semi-major axis
-    int N = 100;        // number of points defining orbit
+double* getThetas(int N, double e, double a) {
     int kTerms = 10;    // number of terms to keep in infinite series defining
-    double M;           // mean anomaly
-    double alpha;       // eccentric anomaly
-    double* theta = malloc(N*sizeof(double));  // preallocate space for true anomaly (theta) array
+    double M;           // mean motion (rad)
+    double alpha;       // eccentric anomaly (rad)
+    double* theta = malloc(N*sizeof(double));  // preallocate space for true anomaly (rad) array
                             
     // Calculate eccentric anomaly at each point in orbit
     // i-th step around the ellipse
@@ -37,7 +40,7 @@ double* getThetas() {
 }
 
 /**
- * function to give LISA model position data from a time and n value
+ * function to give asteroid model position data from a time and n value
 */
 char* model(double theta, double const a, double const ecc, double* const rotMatrix){
     /** angular speed of the asteroid around the sun (for time sim).
@@ -59,6 +62,7 @@ char* model(double theta, double const a, double const ecc, double* const rotMat
 
 int main(){
     printf("Setting up Constants...\n");
+    fflush(stdout);
     double omega_earth = 0; // argument of perihelion of Earth
     // this section will be read from a file eventually
     double a = 1; // semimajor axis in AU
@@ -82,25 +86,21 @@ int main(){
         cos(iota)                                                     // 3 3   
     }; 
 
-    printf("Data Creation Started...\n");
+    printf("Constants Defined.\nData Creation Started...\n");
+    fflush(stdout);
     FILE* file = fopen("export.csv", "w");
     // data format: x,y,z\n"
     // time in years
     double t_max = 1;
-    double dt = 1/365/24/3600; // 0.001;
+    int N = 365*24*3600;
+    double dt = t_max/N; // 0.001;
+    double* thetas = getThetas(N, ecc, a);
 
-    for(int i=0; i<(int)floor(t_max/dt); i++){
+    for(int i=0; i<N; i++){
         char temp[100];
         strcpy(temp, "");
-        for (int n=0; n<3; n++){
-            char* data_i_n = model(i*dt, a, ecc, rotationMatrix);
-
-            strcat(temp, data_i_n);
-            free(data_i_n);
-            if (n<2){
-                strcat(temp, ",");
-            }
-        }
+        char* data_i = model(thetas[i], a, ecc, rotationMatrix);
+        free(data_i);
         fprintf(file, "%s\n", temp);
     }
     fclose(file);
