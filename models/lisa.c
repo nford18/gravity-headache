@@ -1,5 +1,6 @@
 #define _USE_MATH_DEFINES
 #define LINE_MAX 150
+#include "lisa.h"
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -12,9 +13,6 @@ int f_m = 1; // modulation frequency (1/yr)
 double lambda = 0;
 double kappa = 0; 
 
-/**
- * function to give LISA model position data from a time and n value
-*/
 char* model(double t, int n){
     double alpha = 2*M_PI*f_m*t + kappa;
     double beta = 2*M_PI*n/3 + lambda;
@@ -32,12 +30,13 @@ char* model(double t, int n){
 
 int main(){
     printf("Data Creation Started...\n");
-    FILE* file = fopen("export.csv", "w");
+    FILE* file = fopen("../plots/export_lisa.csv", "w");
     // data format: x0,y0,z0,x1,y1,z1,x2,y2,z2\n"
     // time in years
     double t_max = 1;
-    int N = 365*24*3600;
-    double dt = t_max/N; // 0.001;
+    // double dt = 1/(365*24*3600);
+    double dt = 0.001;
+    int N = (int)floor(t_max/dt);
 
     for(int i=0; i<N; i++){
         char temp[100];
