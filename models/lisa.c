@@ -34,8 +34,8 @@ int main(){
     // data format: x0,y0,z0,x1,y1,z1,x2,y2,z2\n"
     // time in years
     double t_max = 1;
-    // double dt = 0.000114155251; // = 1/(365*24)  <-- this wasn't working
-    double dt = 0.001;
+    double dt =  1.0/((double)365.0*24.0); // = 1/(365*24)  <-- this wasn't working
+    // double dt = 0.001;
     int N = (int)floor(t_max/dt);
     double* times = (double*) malloc(N*sizeof(double));
     times[0] = 0;
