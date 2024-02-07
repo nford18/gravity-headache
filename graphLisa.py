@@ -16,7 +16,6 @@ with open("./cappy/plots/" + filename + ".csv") as file:
         data_list.append(data[i].strip("\n").split(","))
     for i in range(len(data_list)):
         for j in range(len(data_list[i])):
-            # print(j//3, j%3)
             pos[j//3][j%3].append(float(data_list[i][j]))
 
 ###########################################

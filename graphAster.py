@@ -1,10 +1,6 @@
 import matplotlib.pyplot as plt
-import math
 
 filename = "export_ast"
-
-def getDist(v1, v2,i):
-    return math.sqrt( (v1[0][i]-v2[0][i])**2 + (v1[1][i]-v2[1][i])**2 + (v1[2][i]-v2[2][i])**2)
 
 with open("./cappy/plots/" + filename + ".csv") as file:
     # file.readline() # format line
@@ -16,7 +12,6 @@ with open("./cappy/plots/" + filename + ".csv") as file:
     print(len(data_list),len(data_list[0]))
     for i in range(len(data_list)):
         for j in range(len(data_list[i])):
-            # print(j%2)
             pos[j%3].append(float(data_list[i][j]))
 
 ###########################################
