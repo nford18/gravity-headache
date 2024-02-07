@@ -24,9 +24,9 @@ with open("./cappy/plots/" + filename + ".csv") as file:
 ###########################################
 
 ax = plt.figure().add_subplot(111, projection='3d')
-ax.scatter(pos[0][0] + pos[1][0] + pos[2][0]
-          ,pos[0][1] + pos[1][1] + pos[2][1]
-          ,pos[0][2] + pos[1][2] + pos[2][2])
+ax.scatter(pos[0][0], pos[0][1], pos[0][2], marker=".")
+ax.scatter(pos[1][0], pos[1][1], pos[1][2], marker=".")
+ax.scatter(pos[2][0], pos[2][1], pos[2][2], marker=".")
 ax.set_xlabel('x (AU)')
 ax.set_ylabel('y (AU)')
 ax.set_zlabel('z (AU)')
@@ -45,6 +45,7 @@ plt.show()
 # posDiff = [[],[],[],[]] # t, 01, 02, 12
 # t_max = 1 # yr
 # dt = 0.001 # yr
+# dt = 1.0/(365.0*24.0)
 # for i in range(len(pos[0][0])):
 #     posDiff[0].append(i*dt)
 #     posDiff[1].append(getDist(pos[0],pos[1],i))

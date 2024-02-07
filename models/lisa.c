@@ -34,23 +34,26 @@ int main(){
     // data format: x0,y0,z0,x1,y1,z1,x2,y2,z2\n"
     // time in years
     double t_max = 1;
-    // double dt = 1/(365*24*3600);
+    // double dt = 0.000114155251; // = 1/(365*24)  <-- this wasn't working
     double dt = 0.001;
     int N = (int)floor(t_max/dt);
-
-    for(int i=0; i<N; i++){
-        char temp[100];
-        strcpy(temp, "");
-        for (int n=0; n<3; n++){
-            char* data_i_n = model(i*dt, n);
-            strcat(temp, data_i_n);
-            free(data_i_n);
-            if (n<2){
-                strcat(temp, ",");
-            }
-        }
-        fprintf(file, "%s\n", temp);
+    double* times = (double*) malloc(N*sizeof(double));
+    times[0] = 0;
+    for(int i=1; i<N; i++){
+        times[i] = times[i-1] + dt;
     }
+    for(int i=0; i<N; i++){
+        for (int n=0; n<3; n++){
+            char* data_i_n = model(times[i], n);
+            if (n<2){
+                fprintf(file, "%s,", data_i_n);
+            } else {
+                fprintf(file, "%s\n", data_i_n);
+            }
+            free(data_i_n);
+        }
+    }
+    free(times);
     fclose(file);
     printf("Data Creation Finished...\n");
     return 0;

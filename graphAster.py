@@ -23,16 +23,11 @@ with open("./cappy/plots/" + filename + ".csv") as file:
 #               Orbit Plot                #
 ###########################################
 
-# ax = plt.plot(pos[0], pos[1])
 ax = plt.figure().add_subplot(111, projection='3d')
-ax.scatter(pos[0], pos[1], pos[2])
+ax.scatter(pos[0], pos[1], pos[2], marker=".")
 ax.set_xlabel('x (AU)')
 ax.set_ylabel('y (AU)')
 ax.set_zlabel('z (AU)')
-# ax.set_xlim3d(-1.05,1.05)
-# ax.set_ylim3d(-1.05,1.05)
 
-# ax.set_zlim3d(-0.5, 0.5) # zoom out
-# ax.set_zlim3d(-0.075, 0.075) # zoom in
-plt.title('The Asteroid plots')
+plt.title('The Asteroid plot')
 plt.show()
