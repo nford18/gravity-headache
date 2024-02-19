@@ -10,13 +10,13 @@ with open("./cappy/data/fullData.csv", "w+") as new_file:
     with open("./cappy/data/source_data.csv") as file:
         file.readline() # skip header line
         data = file.readlines()
-        for line in data:
+        for index, line in enumerate(data):
             lineArr = line.strip("\n").split(",")
             newline = ["0: type","1: e","2: a","3: i","4: om","5: w",
                     "6: diameter","7: H","8: albedo","9: density"]
             hadDiameter = lineArr[5] != ""
             hadAlbedo = lineArr[7] != ""
-            hadH = lineArr[6] != ""
+            missingH = lineArr[6] == "" # apparently there are 5 blank H values
 
             # populate new line with orbital parameters
             newline[1] = lineArr[0] # e
@@ -24,7 +24,9 @@ with open("./cappy/data/fullData.csv", "w+") as new_file:
             newline[3] = lineArr[2] # i
             newline[4] = lineArr[3] # om
             newline[5] = lineArr[4] # w
-            if(hadH):
+            if(missingH):
+                print("line", index, "skipped due to missing H-value.")
+            else:
                 # populate new line with H
                 newline[7] = lineArr[6]
                 if(hadAlbedo):
