@@ -13,7 +13,7 @@
  * 
  * @return pointer to an array of true anomaly values for the elliptical orbit
  */
-double* getThetas(int N, double e, double a);
+double* getThetas(int N, double e, double a, double period);
 
 /**
  * function to give asteroid model position data from a time and n value

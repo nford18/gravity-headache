@@ -29,13 +29,13 @@ with open("./cappy/data/fullData.csv", "w+") as new_file:
                     # grab given albedo
                     albedo = float(lineArr[7])
                     # find type from albedo
-                    if (albedo==0.03):
+                    if (abs(albedo-0.03) <=0.001):
                         astType = "C"
                     elif (albedo > 0.18):
                         astType = "S"
                     else:
                         # if [0.1, 0.18), pick S or M based on rarity distribution
-                        if(rand.uniform(0.0,25.0) <=17.0):
+                        if(rand.uniform(0.0,0.25) <=0.17):
                             astType = "S"
                         else:
                             astType = "M"
@@ -66,30 +66,8 @@ with open("./cappy/data/fullData.csv", "w+") as new_file:
                 else:
                     density = rand.uniform(6.73375, 6.87875)
                 
+                volume = math.pi/6.0 * math.pow(diameter,3)
                 newline[5] = str(math.pi/6.0 * math.pow(diameter,3) *density)
                 for element in newline:
                     new_file.write(element.strip("[]\'") + ", ")
                 new_file.write("\n")
-"""
-// Graphing diameter for testing 
-print("Valid points found: " + str(len(d_arr)))
-output = plt.hist(d_arr, bins = "auto", density = True)
-# print(output)
-sum = 0
-start = output[1][0]
-width = output[1][1] - output[1][0]
-with open("./cappy/data/radius_distribution.csv", "w+") as file:
-    for i in range(len(output[0])):
-        sum += output[0][i]
-        file.write(str(i) + "," + str(output[0][i]) + "\n")
-    file.write("total," + str(sum) + "\n")
-    file.write("start," + str(output[1][0]) + "\n")
-    file.write("width," + str(output[1][1] - output[1][0]) + "\n")
-plt.show()
-# plt.plot(r_fromD, marker=".", label="diameter")
-# # plt.plot(r_fromH, marker=".", label="bronicki")
-# plt.xlabel = 'asteroid number'
-# plt.ylabel = 'radius (km)'
-# plt.legend()
-# plt.show()
-"""
