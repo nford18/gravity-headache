@@ -59,6 +59,7 @@ int main(){
     printf("Setting up Constants...\n");
     fflush(stdout);
     // this section will be read from a file eventually
+    // fairly circular
     double a = 1.084; // semimajor axis in AU
     double ecc = 0.0028; // eccentricity of orbit
     double longitude = 282.58; // longitude of perihelion in degrees
@@ -66,7 +67,16 @@ int main(){
     double omega = 210.62; // argument of perihelion in degrees
     double iota = 22.08; // inclination of orbital plane in degrees
     double period = 1.13; // sidereal orbital period in years
-    // double H = 24.8; // absolute magnitude in ??
+    // double mass = 0.001; // derived mass of asteroid in kg
+
+    // high period
+    // double a = 17.79; // semimajor axis in AU
+    // double ecc = 0.9482; // eccentricity of orbit
+    // double longitude = 48.70; // longitude of perihelion in degrees
+    // double Omega0 = 360 - omega_EARTH + longitude; // modified longitude of perihelion
+    // double omega = 333.30; // argument of perihelion in degrees
+    // double iota = 19.67; // inclination of orbital plane in degrees
+    // double period = 75; // sidereal orbital period in years
 
     // the rotation matrix for the asteroid's orbital plane.
     // accessed as [3*row +col]
