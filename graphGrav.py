@@ -1,13 +1,15 @@
 import matplotlib.pyplot as plt
 import math
 
+DONUT_RADIUS = 0.2 # AU
+
 """Gets the squared distance from start to end at the i-th time step"""
-def getDist2(start, end, i):
+def getDistSquare(start, end, i):
     return (end[0][i]-start[0][i])**2 + (end[1][i]-start[1][i])**2 + (end[2][i]-start[2][i])**2
 
 """Gets the unit vector from start toward end at the i-th time step"""
 def getDir(start, end, i):
-    mag = math.sqrt(getDist2(start, end, i))
+    mag = math.sqrt(getDistSquare(start, end, i))
     return [(end[0][i]-start[0][i])/mag, (end[1][i]-start[1][i])/mag, (end[2][i]-start[2][i])/mag]
 
 """Retrieves a random mass based on the distributions of asteroid density and asteroid diameter"""
@@ -18,7 +20,7 @@ def getMass():
 # import LISA data
 filename = "export_lisa"
 with open("./cappy/plots/" + filename + ".csv") as file:
-    # file.readline() # format line
+    file.readline() # format line
     data = file.readlines()
     data_list = []
     pos_lisa = [[[],[],[]],[[],[],[]],[[],[],[]]] # pos[n][x_i][~t]
@@ -33,7 +35,7 @@ with open("./cappy/plots/" + filename + ".csv") as file:
 # import Asteroid data
 filename = "export_ast"
 with open("./cappy/plots/" + filename + ".csv") as file:
-    # file.readline() # format line
+    file.readline() # format line
     data = file.readlines()
     data_list = []
     pos_aster = [[],[],[]] # pos[x_i][~t]
@@ -44,18 +46,22 @@ with open("./cappy/plots/" + filename + ".csv") as file:
         for j in range(len(data_list[i])):
             pos_aster[j%3].append(float(data_list[i][j]))
 
+# calculate acceleration
 accel = []
 M=1
 if(len(pos_aster[0]) == len(pos_lisa[0][0])):
     for i in range(len(pos_aster[0])):
-        minDist = getDist2(pos_lisa[0], pos_aster, i)
-
-        for n in range(1,3):
-            dist = getDist2(pos_lisa[n], pos_aster, i)
-            if (dist < minDist):
-                minDist = dist
-        a_i = M/minDist  # from F = GMm/r^2 => a = GM/r^2 ; G=1 in our units
-        accel.append(a_i)
+        minDistSquare = min(getDistSquare(pos_lisa[0], pos_aster, i),
+                    getDistSquare(pos_lisa[1], pos_aster, i),
+                    getDistSquare(pos_lisa[2], pos_aster, i))
+        # only save the value if it's in the donut
+        if (minDistSquare < DONUT_RADIUS**2):
+        # a_i from F = GMm/r^2 => a = GM/r^2 ; G=1 in our units
+            a_i = M/minDistSquare  
+            accel.append(a_i)
+else:
+    # Show error message
+    print("Array lengths do not match: array[" + str(len(pos_aster[0])) + "] and array[" + str(len(pos_lisa[0][0])) + "] found.")
 
 """
 
