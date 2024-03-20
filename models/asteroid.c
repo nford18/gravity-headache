@@ -120,3 +120,37 @@ int main(){
     printf("Data Creation Finished\n");
     return 0;
 }
+
+int sign(float x){
+    return (int) x/fabs(x);
+}
+float f(float E ,float ecc, float M){
+        // M = E - e sin(E)
+        return E - ecc * sin(E) - M;
+    }
+
+
+float bisection(float M, float ecc, float a, float b, float tol){ 
+    // # approximates a root, R, of f bounded 
+    // # by a and b to within tolerance 
+    // # | f(m) | < tol with m the midpoint 
+    // # between a and b Recursive implementation
+    
+    
+    // # check if a and b bound a root
+    if (sign(f(a, ecc, M)) == sign(f(b, ecc, M))){
+        perror("The scalars a and b do not bound a root\n");
+    }
+        
+    // # get midpoint
+    float m = (a + b)/2;
+    
+    if (fabs(f(m, ecc, M)) < tol){
+        // # stopping condition, report m as root
+        return m;
+    }else if(sign(f(a, ecc, M)) == sign(f(m, ecc, M))){
+        return bisection(M, ecc, m, b, tol);
+    }else if (sign(f(b, ecc, M)) == sign(f(m, ecc, M))){
+        return bisection(M, ecc, a, m, tol);
+    }
+}
