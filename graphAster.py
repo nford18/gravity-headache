@@ -12,6 +12,7 @@ with open("./cappy/plots/" + filename + ".csv") as file:
     print(len(data_list),len(data_list[0]))
     for i in range(len(data_list)):
         for j in range(len(data_list[i])):
+            print(pos)
             pos[j%3].append(float(data_list[i][j]))
 
 ###########################################
@@ -25,4 +26,14 @@ ax.set_ylabel('y (AU)')
 ax.set_zlabel('z (AU)')
 
 plt.title('The Asteroid plot')
+plt.show()
+
+###########################################
+#                xyz Plot                 #
+###########################################
+
+plt.plot(pos[0], label="x (AU)")
+plt.plot(pos[1], label="y (AU)")
+plt.plot(pos[2], label="z (AU)")
+plt.legend()
 plt.show()

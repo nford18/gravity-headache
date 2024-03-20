@@ -11,8 +11,8 @@ with open("./cappy/data/fullData.csv", "r") as file:
     # i = 0
     max = 0
     for line in data:
-        value = float(line.strip("\n").split(",")[5])
-        if(value < 10**2):
+        value = float(line.strip("\n").split(",")[9])
+        if(value < 10**1):
             masses1.append(value)
         # elif(value < 10**2):
         #     masses2.append(value)

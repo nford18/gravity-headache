@@ -3,17 +3,30 @@
  * 
  * author: Nick Ford
 */
+
+
 /**
- * Function adapted from a matlab program found at this url:
+ * Calculates the eccentric anomaly from the mean anomaly and eccentricity. 
+ * Function adapted from a matlab program found here:
  * https://www.matlab-monkey.com/astro/keplerEquation/KeplerEquationPub.html
  * 
+ * @param M the mean anomaly
+ * @param e the eccentricity of the orbit
+ * 
+ * @return the eccentric anomaly
+*/
+double besselApprox(double M, double e);
+
+/**
+ * Calculates the true anomaly value for a given time and set of orbital parameters
+ * 
+ * @param t time to find the position at
  * @param N number of divisions for the ellipse
  * @param e eccentricity of the ellipse
- * @param a semi-major axis of the ellipse (AU)
  * 
- * @return pointer to an array of true anomaly values for the elliptical orbit
+ * @return the true anomaly value at the given time for the elliptical orbit
  */
-double* getThetas(int N, double e, double a, double period);
+double getTheta(double t, double e, double period);
 
 /**
  * function to give asteroid model position data from a time and n value

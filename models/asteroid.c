@@ -7,27 +7,31 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-double* getThetas(int N, double e, double a, double period) {
+double besselApprox(double M, double e){
     int kTerms = 10;    // number of terms to keep in infinite series defining
+    double anomaly = M;
+    // include first kTerms in infinite series
+    for (int k = 1; k <=kTerms; k++) {
+        anomaly += 2/k * jn(k,k*e) * sin(k*M);
+    }
+    return anomaly;
+}
+double getTheta(double t, double e, double period) {
     double M;           // mean motion (rad)
     double anomaly;       // eccentric anomaly (rad)
-    double* theta = malloc(N*sizeof(double));  // preallocate space for true anomaly (rad) array
-                            
+    // double* thetas = malloc(N*sizeof(double));  // preallocate space for true anomaly (rad) array
+    double theta; // true anomaly (rad)
+
     // Calculate eccentric anomaly at each point in orbit
     // i-th step around the ellipse
-    for (int i=0; i<N; i++){
-        // M varies from 0 to 2*pi over one orbit
-        // TODO: must be adjusted based on the period
-        M = i*2*M_PI/N;
-        // initialize eccentric anomaly to mean anomaly
-        anomaly = M;
-        // include first kTerms in infinite series
-        for (int k = 1; k <=kTerms; k++) {
-            anomaly += 2/k * jn(k,k*e) * sin(k*M);
-        }
-        // calculate theta from eccentric anomaly values
-        theta[i] = 2 * atan(sqrt((1+e)/(1-e)) * tan(anomaly/2));
-    }  
+
+    // M varies from 0 to 2*pi/period over one period
+    M = 2*M_PI*t/period;
+    printf("%lf\n", M);
+    // calculate eccentric anomaly from mean anomaly and eccentricity
+    anomaly = besselApprox(M, e);
+    // calculate theta from eccentric anomaly values
+    theta = 2 * atan(sqrt((1+e)/(1-e)) * tan(anomaly/2));
     // theta must be freed somewhere 
     return theta;  
 }
@@ -60,23 +64,23 @@ int main(){
     fflush(stdout);
     // this section will be read from a file eventually
     // fairly circular
-    double a = 1.084; // semimajor axis in AU
-    double ecc = 0.0028; // eccentricity of orbit
-    double longitude = 282.58; // longitude of perihelion in degrees
-    double Omega0 = 360 - omega_EARTH + longitude; // modified longitude of perihelion
-    double omega = 210.62; // argument of perihelion in degrees
-    double iota = 22.08; // inclination of orbital plane in degrees
-    double period = 1.13; // sidereal orbital period in years
+    // double a = 1.084; // semimajor axis in AU
+    // double ecc = 0.0028; // eccentricity of orbit
+    // double longitude = 282.58; // longitude of perihelion in degrees
+    // double Omega0 = 360 - omega_EARTH + longitude; // modified longitude of perihelion
+    // double omega = 210.62; // argument of perihelion in degrees
+    // double iota = 22.08; // inclination of orbital plane in degrees
+    // double period = 1.13; // sidereal orbital period in years
     // double mass = 0.001; // derived mass of asteroid in kg
 
     // high period
-    // double a = 17.79; // semimajor axis in AU
-    // double ecc = 0.9482; // eccentricity of orbit
-    // double longitude = 48.70; // longitude of perihelion in degrees
-    // double Omega0 = 360 - omega_EARTH + longitude; // modified longitude of perihelion
-    // double omega = 333.30; // argument of perihelion in degrees
-    // double iota = 19.67; // inclination of orbital plane in degrees
-    // double period = 75; // sidereal orbital period in years
+    double a = 17.79; // semimajor axis in AU
+    double ecc = 0.9482; // eccentricity of orbit
+    double longitude = 48.70; // longitude of perihelion in degrees
+    double Omega0 = 360.0 - omega_EARTH + longitude; // modified longitude of perihelion
+    double omega = 333.30; // argument of perihelion in degrees
+    double iota = 19.67; // inclination of orbital plane in degrees
+    double period = 75.0; // sidereal orbital period in years
 
     // the rotation matrix for the asteroid's orbital plane.
     // accessed as [3*row +col]
@@ -99,18 +103,19 @@ int main(){
     // time in years
     double t_max = 1;
     double dt = 1.0/((double)365.0*24.0);
-    printf("%.12lf", dt);
+    printf("dt: %.12lf\n", dt);
     // double dt = 0.001;
     int N = (int)floor(t_max/dt);
-    double* thetas = getThetas(N, ecc, a, period);
+    // double* thetas = getThetas(N, ecc, a, period);
 
     for(int i=0; i<N; i++){
         // printf("%d",i);
-        char* data_i = model(thetas[i], a, ecc, rotationMatrix);
+        double theta = getTheta(i*dt, ecc, a, period);
+        char* data_i = model(theta, a, ecc, rotationMatrix);
         fprintf(file, "%s\n", data_i);
         free(data_i);
     }
-    free(thetas);
+    // free(thetas);
     fclose(file);
     printf("Data Creation Finished\n");
     return 0;
