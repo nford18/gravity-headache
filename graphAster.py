@@ -12,7 +12,7 @@ with open("./cappy/plots/" + filename + ".csv") as file:
     print(len(data_list),len(data_list[0]))
     for i in range(len(data_list)):
         for j in range(len(data_list[i])):
-            print(pos)
+            # print(pos)
             pos[j%3].append(float(data_list[i][j]))
 
 ###########################################

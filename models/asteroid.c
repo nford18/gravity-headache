@@ -2,6 +2,7 @@
 #define LINE_MAX 150
 #define omega_EARTH 0 // argument of perihelion of Earth in degrees
 #include "asteroid.h"
+#include <stdbool.h>
 #include <math.h>
 #include <string.h>
 #include <stdio.h>
@@ -16,10 +17,46 @@ double besselApprox(double M, double e){
     }
     return anomaly;
 }
+
+int sign(float x){
+    // return (int) x/fabs(x);
+    return (x > 0) - (x < 0);
+}
+
+float f(float E ,float ecc, float M){
+    // M = E - e sin(E)
+    return E - ecc * sin(E) - M;
+}
+
+float bisection(float M, float ecc, float a, float b, float tol){ 
+    // # approximates a root, R, of f bounded 
+    // # by a and b to within tolerance 
+    // # | f(m) | < tol with m the midpoint 
+    // # between a and b Recursive implementation
+    // # check if a and b bound a root
+    if (sign(f(a, ecc, M)) == sign(f(b, ecc, M))){
+        perror("The scalars a and b do not bound a root\n");
+        // return -10.0;
+    }
+        
+    while(true){
+        float m = (a + b)/2;
+        if (fabs(f(m, ecc, M)) < tol){
+            // # stopping condition, report m as root
+            return m;
+        }else if(sign(f(a, ecc, M)) == sign(f(m, ecc, M))){
+            // root is in right half
+            a = m;
+        }else if (sign(f(b, ecc, M)) == sign(f(m, ecc, M))){
+            // root is in left half
+            b = m;
+        }
+    }
+}
+
 double getTheta(double t, double e, double period) {
     double M;           // mean motion (rad)
     double anomaly;       // eccentric anomaly (rad)
-    // double* thetas = malloc(N*sizeof(double));  // preallocate space for true anomaly (rad) array
     double theta; // true anomaly (rad)
 
     // Calculate eccentric anomaly at each point in orbit
@@ -27,11 +64,13 @@ double getTheta(double t, double e, double period) {
 
     // M varies from 0 to 2*pi/period over one period
     M = 2*M_PI*t/period;
-    printf("%lf\n", M);
+    printf("%lf: ", M);
     // calculate eccentric anomaly from mean anomaly and eccentricity
-    anomaly = besselApprox(M, e);
+    // anomaly = besselApprox(M, e);
+    anomaly = bisection(M, e, 0, 2*M_PI, 0.001);
     // calculate theta from eccentric anomaly values
     theta = 2 * atan(sqrt((1+e)/(1-e)) * tan(anomaly/2));
+    printf("%lf\n", theta);
     // theta must be freed somewhere 
     return theta;  
 }
@@ -109,48 +148,12 @@ int main(){
     // double* thetas = getThetas(N, ecc, a, period);
 
     for(int i=0; i<N; i++){
-        // printf("%d",i);
-        double theta = getTheta(i*dt, ecc, a, period);
+        double theta = getTheta(i*dt, ecc, period);
         char* data_i = model(theta, a, ecc, rotationMatrix);
         fprintf(file, "%s\n", data_i);
         free(data_i);
     }
-    // free(thetas);
     fclose(file);
     printf("Data Creation Finished\n");
     return 0;
-}
-
-int sign(float x){
-    return (int) x/fabs(x);
-}
-float f(float E ,float ecc, float M){
-        // M = E - e sin(E)
-        return E - ecc * sin(E) - M;
-    }
-
-
-float bisection(float M, float ecc, float a, float b, float tol){ 
-    // # approximates a root, R, of f bounded 
-    // # by a and b to within tolerance 
-    // # | f(m) | < tol with m the midpoint 
-    // # between a and b Recursive implementation
-    
-    
-    // # check if a and b bound a root
-    if (sign(f(a, ecc, M)) == sign(f(b, ecc, M))){
-        perror("The scalars a and b do not bound a root\n");
-    }
-        
-    // # get midpoint
-    float m = (a + b)/2;
-    
-    if (fabs(f(m, ecc, M)) < tol){
-        // # stopping condition, report m as root
-        return m;
-    }else if(sign(f(a, ecc, M)) == sign(f(m, ecc, M))){
-        return bisection(M, ecc, m, b, tol);
-    }else if (sign(f(b, ecc, M)) == sign(f(m, ecc, M))){
-        return bisection(M, ecc, a, m, tol);
-    }
 }

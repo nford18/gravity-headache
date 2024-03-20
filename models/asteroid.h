@@ -18,6 +18,36 @@
 double besselApprox(double M, double e);
 
 /**
+ * Finds the sign of the input. Helper function for bisection
+ * @param x the value to find the sign of
+ * 
+ * @returns the +1/-1 for positive/negative, respectively 
+*/
+int sign(float x);
+
+/**
+ * Function to calculate the bisection of
+ * @param E the input eccentric anomaly
+ * @param ecc the orbital eccentricity
+ * @param M the mean anaomaly
+ * 
+ * @returns the +1/-1 for positive/negative, respectively 
+*/
+float f(float E ,float ecc, float M);
+
+/**
+ * root finding function, specifically for finding the eccentric anomaly
+ * @param M the mean anomaly
+ * @param ecc the orbital eccentricity
+ * @param a left guess bound
+ * @param b right guess bound
+ * @param tol tolerence for checking if the root was found
+ * 
+ * @returns the root that was found
+*/
+float bisection(float M, float ecc, float a, float b, float tol);
+
+/**
  * Calculates the true anomaly value for a given time and set of orbital parameters
  * 
  * @param t time to find the position at
