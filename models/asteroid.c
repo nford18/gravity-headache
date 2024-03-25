@@ -7,6 +7,7 @@
 #include <string.h>
 #include <stdio.h>
 #include <stdlib.h>
+// #include <unistd.h>
 
 double besselApprox(double M, double e){
     int kTerms = 10;    // number of terms to keep in infinite series defining
@@ -28,7 +29,7 @@ float f(float E ,float ecc, float M){
     return E - ecc * sin(E) - M;
 }
 
-float bisection(float M, float ecc, float a, float b, float tol){ 
+double bisection(double M, double ecc, double a, double b, double tol){ 
     // # approximates a root, R, of f bounded 
     // # by a and b to within tolerance 
     // # | f(m) | < tol with m the midpoint 
@@ -40,7 +41,7 @@ float bisection(float M, float ecc, float a, float b, float tol){
     }
         
     while(true){
-        float m = (a + b)/2;
+        double m = (a + b)/2;
         if (fabs(f(m, ecc, M)) < tol){
             // # stopping condition, report m as root
             return m;
@@ -64,13 +65,20 @@ double getTheta(double t, double e, double period) {
 
     // M varies from 0 to 2*pi/period over one period
     M = 2*M_PI*t/period;
-    printf("%lf: ", M);
+    // printf("%.10lf (", M);
     // calculate eccentric anomaly from mean anomaly and eccentricity
     // anomaly = besselApprox(M, e);
-    anomaly = bisection(M, e, 0, 2*M_PI, 0.001);
+    anomaly = bisection(M, e, 0, 2*M_PI, 0.000001);
+    // printf("%.10lf): ", anomaly);
+
     // calculate theta from eccentric anomaly values
-    theta = 2 * atan(sqrt((1+e)/(1-e)) * tan(anomaly/2));
-    printf("%lf\n", theta);
+    double eccPart = sqrt((1.0+e)/(1.0-e));
+    // printf("%.10lf, ", eccPart);
+    double tanPart = tan(anomaly/2.0);
+    // printf("%.10lf, ", tanPart);
+
+    theta = 2.0 * atan(eccPart * tanPart);
+    // printf("%.10lf\n", theta);
     // theta must be freed somewhere 
     return theta;  
 }
@@ -138,22 +146,33 @@ int main(){
     printf("Constants Defined\nData Creation Started...\n");
     fflush(stdout);
     FILE* file = fopen("../plots/export_ast.csv", "w");
-    // data format: x,y,z\n"
-    // time in years
-    double t_max = 1;
-    double dt = 1.0/((double)365.0*24.0);
-    printf("dt: %.12lf\n", dt);
-    // double dt = 0.001;
-    int N = (int)floor(t_max/dt);
-    // double* thetas = getThetas(N, ecc, a, period);
+    if (file == NULL){
+        printf("file open error: %d", errno);
+        return 1;
+    }else{
+        // data format: x,y,z\n"
+        // time in years
+        double t_max = 1;
+        double dt = 1.0/((double)365.0*24.0);
+        // printf("dt: %.12lf\n", dt);
+        // double dt = 0.001;
+        int N = (int)floor(t_max/dt);
+        // double* thetas = getThetas(N, ecc, a, period);
 
-    for(int i=0; i<N; i++){
-        double theta = getTheta(i*dt, ecc, period);
-        char* data_i = model(theta, a, ecc, rotationMatrix);
-        fprintf(file, "%s\n", data_i);
-        free(data_i);
+        for(int i=0; i<N; i++){
+            double theta = getTheta(i*dt, ecc, period);
+            char* data_i = model(theta, a, ecc, rotationMatrix);
+            // if(i == 0 || i == N-1){
+            //     printf("test: %s\n",data_i);
+            // }
+            int fpfOutput = fprintf(file, "%s\n", data_i);
+            if (fpfOutput < 0){
+                printf("File Printing Failed: %d\n",fpfOutput);
+            }
+            free(data_i);
+        }
+        fclose(file);
+        printf("Data Creation Finished\n");
+        return 0;
     }
-    fclose(file);
-    printf("Data Creation Finished\n");
-    return 0;
 }

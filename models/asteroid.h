@@ -1,3 +1,5 @@
+#ifndef __ASTEROID__
+#define __ASTEROID__
 /**
  * blah blah file description
  * 
@@ -45,7 +47,7 @@ float f(float E ,float ecc, float M);
  * 
  * @returns the root that was found
 */
-float bisection(float M, float ecc, float a, float b, float tol);
+double bisection(double M, double ecc, double a, double b, double tol);
 
 /**
  * Calculates the true anomaly value for a given time and set of orbital parameters
@@ -64,3 +66,4 @@ double getTheta(double t, double e, double period);
 char* model(double theta, double const a, double const ecc, double* const rotMatrix);
 
 int main();
+#endif
