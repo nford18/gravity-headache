@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 
 filename = "export_ast"
 
-with open("./cappy/plots/" + filename + ".csv") as file:
+with open("./plots/" + filename + ".csv") as file:
     # file.readline() # format line
     data = file.readlines()
     data_list = []

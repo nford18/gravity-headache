@@ -3,10 +3,10 @@ import matplotlib.pyplot as plt
 import numpy.random as rand
 
 # file has order: "e","a","i","om","w","diameter","H","albedo"
-with open("./cappy/data/sbdb_query_results.csv") as file:
+with open("./data/sbdb_query_results.csv") as file:
     file.readline() # skip header line
     data = file.readlines()
-with open("./cappy/data/fullData.csv", "w+") as new_file:
+with open("./data/fullData.csv", "w+") as new_file:
     new_file.write("\'e\', \'a\', \'i\', \'om\', \'w\', \'diameter\', \'H\', \'albedo\', \'type\', \'mass\',\n")
     for index, line in enumerate(data):
         lineArr = line.strip("\n").split(",")

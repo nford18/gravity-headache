@@ -19,7 +19,7 @@ def getMass():
 
 # import LISA data
 filename = "export_lisa"
-with open("./cappy/plots/" + filename + ".csv") as file:
+with open("./plots/" + filename + ".csv") as file:
     file.readline() # format line
     data = file.readlines()
     data_list = []
@@ -34,7 +34,7 @@ with open("./cappy/plots/" + filename + ".csv") as file:
 
 # import Asteroid data
 filename = "export_ast"
-with open("./cappy/plots/" + filename + ".csv") as file:
+with open("./plots/" + filename + ".csv") as file:
     file.readline() # format line
     data = file.readlines()
     data_list = []

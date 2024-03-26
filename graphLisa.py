@@ -6,7 +6,7 @@ filename = "export_lisa"
 def getDist(v1, v2,i):
     return math.sqrt( (v1[0][i]-v2[0][i])**2 + (v1[1][i]-v2[1][i])**2 + (v1[2][i]-v2[2][i])**2)
 
-with open("./cappy/plots/" + filename + ".csv") as file:
+with open("./plots/" + filename + ".csv") as file:
     # file.readline() # format line
     data = file.readlines()
     data_list = []

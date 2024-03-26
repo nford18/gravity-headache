@@ -14,7 +14,7 @@ char** line2Arr(char* line){
     while( token != NULL && token != "\n") {
         printf( " %s\n", token );
     
-        token = strtok(NULL, s);
+        token = strtok(NULL, ",");
    }
 }
 

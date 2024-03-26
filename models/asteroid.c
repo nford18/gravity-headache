@@ -153,7 +153,7 @@ int main(){
         // data format: x,y,z\n"
         // time in years
         double t_max = 1;
-        double dt = 1.0/((double)365.0*24.0);
+        double dt = 1.0/((double)365.0*24.0); // 1 hour converted to years
         // printf("dt: %.12lf\n", dt);
         // double dt = 0.001;
         int N = (int)floor(t_max/dt);
