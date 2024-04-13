@@ -34,7 +34,7 @@ ax.set_ylim3d(-1.05,1.05)
 
 # ax.set_zlim3d(-0.5, 0.5) # zoom out
 ax.set_zlim3d(-0.075, 0.075) # zoom in
-plt.title('The LISA plots')
+plt.title('LISA Orbit Over One Year')
 plt.show()
 
 ###########################################

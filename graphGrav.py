@@ -4,6 +4,7 @@ from numpy import interp
 from scipy.optimize import minimize
 
 DONUT_RADIUS = 0.2 # AU
+METERS_IN_AU = 1.495978*10**11
 
 """Gets the squared distance from start to end"""
 def getDistSquare(start, end):
@@ -49,37 +50,57 @@ with open("./plots/" + filename + ".csv") as file:
     data = file.readlines()
     data_list = []
     pos_aster = [[],[],[]] # pos[x_i][~t]
-    time = []
+    timeFull = []
     for i in range(len(data)):
         data_list.append(data[i].strip("\n").split(","))
     # print(len(data_list),len(data_list[0]))
     for i in range(len(data_list)):
-        time.append(float(i)/365.0/24.0)
+        timeFull.append(float(i)/365.0/24.0)
         for j in range(len(data_list[i])):
             pos_aster[j%3].append(float(data_list[i][j]))
 
 
 # calculate acceleration
 accel = []
-M = 124.84912296080462
-if(not len(pos_aster[0]) == len(pos_lisa[0][0])):
-    # Show error message
-    print("Array lengths do not match: array[" + str(len(pos_aster[0])) + "] and array[" + str(len(pos_lisa[0][0])) + "] found.")
+# M = 0.0010277825457702485
+M = 8611.922318
+G = 6.67 * 10**(-11)
+# if(not len(pos_aster[0]) == len(pos_lisa[0][0])):
+#     # Show error message
+#     print("Array lengths do not match: array[" + str(len(pos_aster[0])) + "] and array[" + str(len(pos_lisa[0][0])) + "] found.")
     
-else:
+# else:
     # for i in range(len(pos_aster[0])):
-    result = minimize(f, [0,0], args=[pos_lisa, pos_aster, time])
-    print(result.x)
-    # only save the value if it's in the donut
-    # if (minDistSquare < DONUT_RADIUS**2):
-    if(not result.success):
-        print("Error:" + str(result.message))
-    else:
-        # a_i from F = GMm/r^2 => a = GM/r^2 ; G=1 in our units
-        a_i = M/result.x[1]
-        accel.append(a_i)
-print(accel)
+result = minimize(f, [0,0], args=[pos_lisa, pos_aster, timeFull])
+print(result.x)
+# only save the value if it's in the donut
+# if (minDistSquare < DONUT_RADIUS**2):
+if(not result.success):
+    print("Error:" + str(result.message))
+else:
+    # a_i from F = GMm/r^2 => a = GM/r^2 ; G=1 in our units
+    thirtyMinutesRange = 0.5/24.0/365.0 # pow(5.70776256, -5)
+    minuteStep = 1.0/60.0/24.0/365.0 # pow(1.90258752, -6)
+    print(thirtyMinutesRange, minuteStep)
+    t = -thirtyMinutesRange
+    timePeak = []
+    i = -30
+    while(t <= thirtyMinutesRange):
+        # get the squared distance (in AU)
+        dist2 = f([result.x[0]+t, result.x[1]+t], args=[pos_lisa, pos_aster, timeFull])
+        # convert the distance to m and plug into accel formula, append
+        accel.append(G*M/(dist2*(METERS_IN_AU)**2))
+        timePeak.append(i)
+        i += 1
+        t += minuteStep
+# print(accel)
+print("Minimum Distance:", math.sqrt(f(result.x, args=[pos_lisa, pos_aster, timeFull]))* METERS_IN_AU, "m")
 
+plt.scatter(timePeak, accel, marker = ".")
+plt.title("LISA Craft Acceleration from Asteroid Around Its Peak")
+plt.xlabel("Time (min)")
+plt.ylabel("Acceleration (m/s^2)")
+plt.show()
 """
 
 density will be chosen from a hat.
