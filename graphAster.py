@@ -1,3 +1,8 @@
+"""
+Script to graph the asteroid simulation position data 
+
+Author: Nicholas Ford
+"""
 import matplotlib.pyplot as plt
 
 filename = "export_ast"
@@ -7,12 +12,12 @@ with open("./plots/" + filename + ".csv") as file:
     data = file.readlines()
     data_list = []
     pos = [[],[],[]] # pos[x_i][~t]
+    # feed raw data string into array
     for i in range(len(data)):
         data_list.append(data[i].strip("\n").split(","))
-    print(len(data_list),len(data_list[0]))
+    # translate data array into 2D position array
     for i in range(len(data_list)):
         for j in range(len(data_list[i])):
-            # print(pos)
             pos[j%3].append(float(data_list[i][j]))
 
 ###########################################

@@ -1,19 +1,31 @@
+"""
+Script to fill in the missing data from the raw data collected from NASA's JPL's Small-Body Database 
+
+Author: Nicholas Ford
+"""
 import math
 import matplotlib.pyplot as plt
 import numpy.random as rand
 
 # file has order: "e","a","i","om","w","diameter","H","albedo"
+# pull in database raw data for filling 
 with open("./data/sbdb_query_results.csv") as file:
     file.readline() # skip header line
     data = file.readlines()
+
+# open/create file to hold full dataset
 with open("./data/fullData.csv", "w+") as new_file:
+    # add column headers to file
     new_file.write("\'e\', \'a\', \'i\', \'om\', \'w\', \'diameter\', \'H\', \'albedo\', \'type\', \'mass\',\n")
+
     for index, line in enumerate(data):
+        # Process existing data into an array
         lineArr = line.strip("\n").split(",")
-        newline = ["e","a","i","om","w","diameter","H","albedo","type","mass"]
+        newline = ["e","a","i","om","w","diameter","H","albedo","type","mass"] # these strings are just for error checking
+        # booleans used in logic below
         hadDiameter = lineArr[5] != ""
         hadAlbedo = lineArr[7] != ""
-        hadH = lineArr[6] != "" # apparently there can be blank H values
+        hadH = lineArr[6] != "" # apparently there CAN be blank H values
 
         # populate new line with orbital parameters
         newline[0] = lineArr[0] # e
@@ -24,12 +36,13 @@ with open("./data/fullData.csv", "w+") as new_file:
         newline[5] = lineArr[5] # diameter
         newline[6] = lineArr[6] # H
         newline[7] = lineArr[7] # albedo
-        # might add period to data grabbing
+        # might add period to data grabbing (have to update indices for this)
         # newline[8] = lineArr[8] # period
 
         if(not hadH):
             print("line", index, "skipped due to missing H-value.")
         else:
+            # section for filling albedos and picking asteroid type
             if(hadAlbedo):
                 # grab given albedo
                 albedo = float(lineArr[7])
@@ -63,7 +76,7 @@ with open("./data/fullData.csv", "w+") as new_file:
                 # grab given diameter
                 diameter = float(lineArr[5])
             else:
-                # derive diameter
+                # derive diameter with Bronicki Method
                 diameter = 10**(-float(lineArr[6])/5.0) / math.sqrt(float(albedo)) * 1329
                 newline[5] = str(diameter)
                     
@@ -75,8 +88,11 @@ with open("./data/fullData.csv", "w+") as new_file:
             else:
                 density = rand.uniform(6.73375, 6.87875)
             
+            # calculate mass
             volume = math.pi/6.0 * math.pow(diameter,3)
             newline[9] = str(volume*density)
+
+            # write to file
             for element in newline:
                 new_file.write(element.strip("[]\'") + ", ")
             new_file.write("\n")

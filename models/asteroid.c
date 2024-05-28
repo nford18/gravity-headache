@@ -39,11 +39,13 @@ double bisection(double M, double ecc, double a, double b, double tol){
         perror("The scalars a and b do not bound a root\n");
         // return -10.0;
     }
-        
+    
+    // keeps iterating until midpoint has a function value 
+    // within the tolerance of zero
     while(true){
         double m = (a + b)/2;
         if (fabs(f(m, ecc, M)) < tol){
-            // # stopping condition, report m as root
+            // stopping condition, report m as root
             return m;
         }else if(sign(f(a, ecc, M)) == sign(f(m, ecc, M))){
             // root is in right half
@@ -61,44 +63,32 @@ double getTheta(double t, double e, double period) {
     double theta; // true anomaly (rad)
 
     // Calculate eccentric anomaly at each point in orbit
-    // i-th step around the ellipse
 
     // M varies from 0 to 2*pi/period over one period
     M = 2*M_PI*t/period;
-    // printf("%.10lf (", M);
+
     // calculate eccentric anomaly from mean anomaly and eccentricity
-    // anomaly = besselApprox(M, e);
     anomaly = bisection(M, e, 0, 2*M_PI, 0.000001);
-    // printf("%.10lf): ", anomaly);
 
-    // calculate theta from eccentric anomaly values
+    // calculate theta from eccentric anomaly and eccentricity values
     double eccPart = sqrt((1.0+e)/(1.0-e));
-    // printf("%.10lf, ", eccPart);
     double tanPart = tan(anomaly/2.0);
-    // printf("%.10lf, ", tanPart);
-
     theta = 2.0 * atan(eccPart * tanPart);
-    // printf("%.10lf\n", theta);
-    // theta must be freed somewhere 
     return theta;  
 }
 
-char* model(double theta, double const a, double const ecc, double* const rotMatrix){
-    /** angular speed of the asteroid around the sun (for time sim).
-     *  may have to calulate at every point
-     */
-    
+char* model(double theta, double const a, double const ecc, double* const rotMatrix){    
+    // calculate the radial distance in the plane, before rotation
     double r = a*(1-pow(ecc,2))/(1+ecc*cos(theta));
+
+    // apply rotation matrix to 3D vector <r cos(), r sin(), 0>
     double x = rotMatrix[0]*r*cos(theta) + rotMatrix[1]*r*sin(theta);
     double y = rotMatrix[3]*r*cos(theta) + rotMatrix[4]*r*sin(theta);
     double z = rotMatrix[6]*r*cos(theta) + rotMatrix[7]*r*sin(theta);
-    // double x_flat = r*cos(theta);
-    // double y_flat = r*sin(theta);
-
     
+    // write position data to string for output
     char tempText[LINE_MAX];
     char* rtnStr = (char*) malloc(LINE_MAX);
-    // snprintf(tempText, sizeof(tempText), "%.10lf,%.10lf", x_flat, y_flat);
     snprintf(tempText, sizeof(tempText), "%.10lf,%.10lf,%.10lf", x, y, z);
     snprintf(rtnStr, strlen(tempText), "%s", tempText);
     return rtnStr;
@@ -110,6 +100,7 @@ int main(){
     printf("Setting up Constants...\n");
     fflush(stdout);
     // this section will be read from a file eventually
+
     // fairly circular
     // double a = 1.084; // semimajor axis in AU
     // double ecc = 0.0028; // eccentricity of orbit
@@ -118,7 +109,6 @@ int main(){
     // double omega = 210.62; // argument of perihelion in degrees
     // double iota = 22.08; // inclination of orbital plane in degrees
     // double period = 1.13; // sidereal orbital period in years
-    // double mass = 0.001; // derived mass of asteroid in kg
 
     // high period
     double a = 17.79; // semimajor axis in AU
@@ -131,16 +121,16 @@ int main(){
 
     // the rotation matrix for the asteroid's orbital plane.
     // accessed as [3*row +col]
-    double rotationMatrix[9] = {
-        cos(Omega0)*cos(omega) - sin(Omega0)*cos(iota)*sin(omega),  // 1 1
-        cos(Omega0)*sin(omega) + sin(Omega0)*cos(iota)*cos(omega),  // 1 2
-        sin(Omega0)*sin(iota),                                       // 1 3
-        -sin(Omega0)*cos(omega) - cos(Omega0)*cos(iota)*sin(omega), // 2 1
-        -sin(Omega0)*sin(omega) + cos(Omega0)*cos(iota)*cos(omega), // 2 2
-        cos(Omega0)*sin(iota),                                       // 2 3 
-        sin(iota)*sin(omega),                                         // 3 1
-        -sin(iota)*cos(omega),                                        // 3 2
-        cos(iota)                                                     // 3 3   
+    double rotationMatrix[9] = {                                     // row col
+        cos(Omega0)*cos(omega) - sin(Omega0)*cos(iota)*sin(omega),   // 0 0
+        cos(Omega0)*sin(omega) + sin(Omega0)*cos(iota)*cos(omega),   // 0 1
+        sin(Omega0)*sin(iota),                                       // 0 2
+        -sin(Omega0)*cos(omega) - cos(Omega0)*cos(iota)*sin(omega),  // 1 0
+        -sin(Omega0)*sin(omega) + cos(Omega0)*cos(iota)*cos(omega),  // 1 1
+        cos(Omega0)*sin(iota),                                       // 1 2 
+        sin(iota)*sin(omega),                                        // 2 0
+        -sin(iota)*cos(omega),                                       // 2 1
+        cos(iota)                                                    // 2 2   
     }; 
 
     printf("Constants Defined\nData Creation Started...\n");
@@ -150,25 +140,24 @@ int main(){
         printf("file open error: %d", errno);
         return 1;
     }else{
-        // data format: x,y,z\n"
-        // time in years
+        // data format: "x,y,z\n"
+        // time is in years
         double t_max = 1;
         double dt = 1.0/((double)365.0*24.0); // 1 hour converted to years
-        // printf("dt: %.12lf\n", dt);
-        // double dt = 0.001;
         int N = (int)floor(t_max/dt);
-        // double* thetas = getThetas(N, ecc, a, period);
 
         for(int i=0; i<N; i++){
+            // get the appropriate theta value
             double theta = getTheta(i*dt, ecc, period);
+            // calculate the position data for that theta 
             char* data_i = model(theta, a, ecc, rotationMatrix);
-            // if(i == 0 || i == N-1){
-            //     printf("test: %s\n",data_i);
-            // }
+            // write data to file
             int fpfOutput = fprintf(file, "%s\n", data_i);
+            // error catching for file writing
             if (fpfOutput < 0){
                 printf("File Printing Failed: %d\n",fpfOutput);
             }
+            // free the malloced memory
             free(data_i);
         }
         fclose(file);

@@ -1,19 +1,26 @@
+"""
+Script to graph the LISA simulation position data 
+
+Author: Nicholas Ford
+"""
 import matplotlib.pyplot as plt
 import math
 
-filename = "export_lisa"
-
+# function to shorthand distance formula in plotting
 def getDist(v1, v2,i):
     return math.sqrt( (v1[0][i]-v2[0][i])**2 + (v1[1][i]-v2[1][i])**2 + (v1[2][i]-v2[2][i])**2)
 
+# import lisa position data
+filename = "export_lisa"
 with open("./plots/" + filename + ".csv") as file:
     # file.readline() # format line
     data = file.readlines()
     data_list = []
     pos = [[[],[],[]],[[],[],[]],[[],[],[]]] # pos[n][x_i][~t]
-    running = True
+    # feed raw data string into array
     for i in range(len(data)):
         data_list.append(data[i].strip("\n").split(","))
+    # translate data array into 2D position array
     for i in range(len(data_list)):
         for j in range(len(data_list[i])):
             pos[j//3][j%3].append(float(data_list[i][j]))
@@ -64,6 +71,8 @@ plt.show()
 ###########################################
 #      Attempt to View Noise Source       #
 ###########################################
+# This section is not used in final plots
+
 # xyPlot = [[],[]] # x,y
 # t_max = 1 # yr
 # dt = 0.001 # yr

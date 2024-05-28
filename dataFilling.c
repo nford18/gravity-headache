@@ -3,7 +3,8 @@
 #include <string.h>
 
 /*
- * File may be a new version of dataFilling.py
+ * File is a start to a C version of dataFilling.py
+ * ==> Remains unused <==
  */ 
 
 char** line2Arr(char* line){
